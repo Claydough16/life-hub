@@ -55,15 +55,22 @@ export function AuthForm() {
 
 	return (
 		<div className="w-full max-w-md">
-			<div className="bg-white shadow-md rounded-lg p-8">
-				<h2 className="text-2xl font-bold text-center mb-6 text-gray-700">
-					{isSignUp ? 'Create Account' : 'Sign In'}
-				</h2>
+			<div className="bg-white shadow-2xl rounded-2xl p-8 border-2 border-teal-100">
+				{/* Logo/Header */}
+				<div className="text-center mb-8">
+					<div className="text-5xl mb-3">🌊</div>
+					<h1 className="text-3xl font-bold bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent mb-2">
+						Life Hub
+					</h1>
+					<p className="text-gray-600 text-sm">
+						{isSignUp ? 'Create your account' : 'Welcome back!'}
+					</p>
+				</div>
 
 				<form onSubmit={handleAuth} className="space-y-4">
 					{isSignUp && (
 						<div>
-							<label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+							<label htmlFor="name" className="block text-sm font-semibold text-gray-700 mb-2">
 								Name
 							</label>
 							<input
@@ -72,13 +79,14 @@ export function AuthForm() {
 								value={name}
 								onChange={(e) => setName(e.target.value)}
 								required
-								className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+								className="w-full px-4 py-3 border-2 border-teal-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-900 transition-all"
+								placeholder="Your name"
 							/>
 						</div>
 					)}
 
 					<div>
-						<label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+						<label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
 							Email
 						</label>
 						<input
@@ -87,12 +95,13 @@ export function AuthForm() {
 							value={email}
 							onChange={(e) => setEmail(e.target.value)}
 							required
-							className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+							className="w-full px-4 py-3 border-2 border-teal-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-900 transition-all"
+							placeholder="you@example.com"
 						/>
 					</div>
 
 					<div>
-						<label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+						<label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">
 							Password
 						</label>
 						<input
@@ -102,15 +111,19 @@ export function AuthForm() {
 							onChange={(e) => setPassword(e.target.value)}
 							required
 							minLength={6}
-							className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+							className="w-full px-4 py-3 border-2 border-teal-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-900 transition-all"
+							placeholder="••••••••"
 						/>
+						{isSignUp && (
+							<p className="text-xs text-gray-500 mt-1">At least 6 characters</p>
+						)}
 					</div>
 
 					{message && (
 						<div
-							className={`p-3 rounded-md text-sm ${message.type === 'error'
-									? 'bg-red-50 text-red-700'
-									: 'bg-green-50 text-green-700'
+							className={`p-4 rounded-lg text-sm font-medium ${message.type === 'error'
+								? 'bg-red-50 text-red-700 border border-red-200'
+								: 'bg-emerald-50 text-emerald-700 border border-emerald-200'
 								}`}
 						>
 							{message.text}
@@ -120,22 +133,36 @@ export function AuthForm() {
 					<button
 						type="submit"
 						disabled={loading}
-						className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+						className="w-full bg-gradient-to-r from-teal-600 to-cyan-600 text-white py-3 rounded-lg hover:from-teal-700 hover:to-cyan-700 disabled:opacity-50 disabled:cursor-not-allowed font-semibold shadow-lg hover:shadow-xl transition-all transform hover:scale-[1.02]"
 					>
-						{loading ? 'Loading...' : isSignUp ? 'Sign Up' : 'Sign In'}
+						{loading ? (
+							<span className="flex items-center justify-center gap-2">
+								<div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+								{isSignUp ? 'Creating account...' : 'Signing in...'}
+							</span>
+						) : (
+							isSignUp ? 'Create Account' : 'Sign In'
+						)}
 					</button>
 				</form>
 
-				<button
-					onClick={() => {
-						setIsSignUp(!isSignUp)
-						setMessage(null)
-					}}
-					className="w-full mt-4 text-sm text-blue-600 hover:underline"
-				>
-					{isSignUp ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
-				</button>
+				<div className="mt-6 text-center">
+					<button
+						onClick={() => {
+							setIsSignUp(!isSignUp)
+							setMessage(null)
+						}}
+						className="text-sm text-teal-600 hover:text-teal-700 font-medium hover:underline transition-colors"
+					>
+						{isSignUp ? 'Already have an account? Sign in' : "Don't have an account? Create one"}
+					</button>
+				</div>
 			</div>
+
+			{/* Footer tagline */}
+			<p className="text-center text-gray-500 text-sm mt-6">
+				Organize your life together 🏠
+			</p>
 		</div>
 	)
 }

@@ -9,6 +9,7 @@ import { supabase } from '@/lib/supabase'
 import { useQuery } from '@tanstack/react-query'
 import { Calendar } from '@/components/Calender'
 import { Tasks } from '@/components/Tasks'
+import { Settings } from '@/components/Settings'
 
 export default function Home() {
   const { user, loading } = useAuth()
@@ -41,6 +42,7 @@ export default function Home() {
     { id: 'notes', label: 'Notes', icon: '📝' },
     { id: 'calendar', label: 'Calendar', icon: '📅' },
     { id: 'tasks', label: 'Tasks', icon: '✓' },
+    { id: 'settings', label: 'Settings', icon: '⚙️' },
   ]
 
   if (loading) {
@@ -60,18 +62,18 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-teal-50 via-cyan-50 to-emerald-50">
       {/* Combined Header with Tabs */}
-      <div className="bg-white border-b border-gray-200">
+      <div className="bg-gradient-to-r from-teal-600 to-cyan-600 border-b border-teal-700 shadow-lg">
         <div className="max-w-7xl mx-auto px-4">
           {/* Top row - Logo and User */}
-          <div className="flex justify-between items-center py-3 border-b border-gray-100">
-            <h1 className="text-xl font-bold text-gray-900">Life Hub</h1>
+          <div className="flex justify-between items-center py-3 border-b border-teal-500/30">
+            <h1 className="text-xl font-bold text-white">🌊 Life Hub</h1>
             <div className="flex items-center gap-4">
-              <span className="text-sm text-gray-600">{user.email}</span>
+              <span className="text-sm text-teal-50">{user.email}</span>
               <button
                 onClick={handleSignOut}
-                className="text-sm text-red-600 hover:underline"
+                className="text-sm text-teal-100 hover:text-white hover:underline transition-colors"
               >
                 Sign Out
               </button>
@@ -79,18 +81,18 @@ export default function Home() {
           </div>
 
           {/* Bottom row - Tabs */}
-          <div className="flex gap-1 py-2">
+          <div className="flex gap-1 py-2 overflow-x-auto">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`
-                  px-4 py-2 rounded-lg font-medium text-sm transition-colors
-                  ${activeTab === tab.id
-                    ? 'bg-blue-100 text-blue-700'
-                    : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+            px-4 py-2 rounded-lg font-medium text-sm transition-all whitespace-nowrap
+            ${activeTab === tab.id
+                    ? 'bg-white text-teal-700 shadow-md'
+                    : 'text-teal-50 hover:bg-teal-500/30 hover:text-white'
                   }
-                `}
+          `}
               >
                 <span className="mr-2">{tab.icon}</span>
                 {tab.label}
@@ -115,6 +117,9 @@ export default function Home() {
             )}
             {activeTab === 'tasks' && (
               <Tasks householdId={household.household_id} userId={user.id} />
+            )}
+            {activeTab === 'settings' && household?.household_id && (
+              <Settings householdId={household.household_id} userId={user.id} />
             )}
           </>
         ) : (

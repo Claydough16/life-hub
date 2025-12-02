@@ -134,24 +134,28 @@ export function Calendar({ householdId, userId }: CalendarProps) {
 	if (isLoading) {
 		return (
 			<div className="flex items-center justify-center py-12">
-				<div className="text-gray-600">Loading calendar...</div>
+				<div className="flex items-center gap-2">
+					<div className="w-2 h-2 bg-teal-600 rounded-full animate-bounce"></div>
+					<div className="w-2 h-2 bg-cyan-600 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+					<div className="w-2 h-2 bg-emerald-600 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+				</div>
 			</div>
 		)
 	}
 
 	return (
 		<>
-			<div className="bg-white rounded-lg shadow-lg p-4 sm:p-6 max-w-4xl mx-auto">
+			<div className="bg-white rounded-lg shadow-xl p-4 sm:p-6 max-w-4xl mx-auto border border-teal-100">
 				{/* Header */}
 				<div className="flex items-center justify-between mb-6">
-					<h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">
+					<h2 className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent">
 						📅 {format(currentMonth, 'MMMM yyyy')}
 					</h2>
 					<div className="flex gap-2">
 						{/* View Toggle */}
 						<button
 							onClick={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
-							className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700 font-medium text-sm"
+							className="px-3 py-2 border-2 border-teal-200 rounded-lg hover:bg-teal-50 text-teal-700 font-medium text-sm transition-all"
 							title={viewMode === 'grid' ? 'Switch to list view' : 'Switch to grid view'}
 						>
 							{viewMode === 'grid' ? '📋' : '📅'}
@@ -159,13 +163,13 @@ export function Calendar({ householdId, userId }: CalendarProps) {
 
 						<button
 							onClick={previousMonth}
-							className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700 font-medium"
+							className="px-3 py-2 border-2 border-teal-200 rounded-lg hover:bg-teal-50 text-teal-700 font-medium transition-all"
 						>
 							←
 						</button>
 						<button
 							onClick={nextMonth}
-							className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700 font-medium"
+							className="px-3 py-2 border-2 border-teal-200 rounded-lg hover:bg-teal-50 text-teal-700 font-medium transition-all"
 						>
 							→
 						</button>
@@ -178,7 +182,7 @@ export function Calendar({ householdId, userId }: CalendarProps) {
 						{/* Day headers */}
 						<div className="grid grid-cols-7 gap-2 mb-2">
 							{['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
-								<div key={day} className="text-center text-sm font-semibold text-gray-600 py-2">
+								<div key={day} className="text-center text-sm font-bold text-teal-700 py-2">
 									{day}
 								</div>
 							))}
@@ -199,26 +203,32 @@ export function Calendar({ householdId, userId }: CalendarProps) {
 											setShowAddDialog(true)
 										}}
 										className={`
-              min-h-[80px] p-2 rounded-lg border transition-colors text-left
-              ${isCurrentMonth ? 'bg-white border-gray-200' : 'bg-gray-50 border-gray-100'}
-              ${isCurrentDay ? 'ring-2 ring-blue-500' : ''}
-              hover:bg-blue-50 hover:border-blue-300
-            `}
+                      min-h-[80px] p-2 rounded-lg border-2 transition-all text-left
+                      ${isCurrentMonth
+												? 'bg-white border-teal-200 hover:border-teal-400 hover:shadow-md'
+												: 'bg-gray-50 border-gray-200'}
+                      ${isCurrentDay ? 'ring-2 ring-teal-500 bg-teal-50' : ''}
+                    `}
 									>
-										<div className={`text-sm font-medium mb-1 ${isCurrentMonth ? 'text-gray-900' : 'text-gray-400'}`}>
+										<div className={`text-sm font-bold mb-1 ${isCurrentDay
+											? 'text-teal-700'
+											: isCurrentMonth
+												? 'text-gray-900'
+												: 'text-gray-400'
+											}`}>
 											{format(day, 'd')}
 										</div>
 										<div className="space-y-1">
 											{dayEvents.slice(0, 2).map((event) => (
 												<div
 													key={event.id}
-													className="text-xs bg-blue-100 text-blue-700 px-1 py-0.5 rounded truncate"
+													className="text-xs bg-gradient-to-r from-teal-100 to-cyan-100 text-teal-700 px-2 py-1 rounded-md truncate font-medium"
 												>
 													{event.all_day ? '🌟' : format(new Date(event.start_time), 'h:mm a')} {event.title}
 												</div>
 											))}
 											{dayEvents.length > 2 && (
-												<div className="text-xs text-gray-500">+{dayEvents.length - 2} more</div>
+												<div className="text-xs text-teal-600 font-medium">+{dayEvents.length - 2} more</div>
 											)}
 										</div>
 									</button>
@@ -237,7 +247,7 @@ export function Calendar({ householdId, userId }: CalendarProps) {
 								setSelectedDate(new Date())
 								setShowAddDialog(true)
 							}}
-							className="w-full mb-4 px-4 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700"
+							className="w-full mb-4 px-4 py-3 bg-gradient-to-r from-teal-600 to-cyan-600 text-white font-medium rounded-lg hover:from-teal-700 hover:to-cyan-700 shadow-md hover:shadow-lg transition-all"
 						>
 							+ Add Event
 						</button>
@@ -245,11 +255,11 @@ export function Calendar({ householdId, userId }: CalendarProps) {
 						{daysWithEvents.length > 0 ? (
 							<div className="space-y-4">
 								{daysWithEvents.map(({ date, events }) => (
-									<div key={date.toISOString()} className="border-l-4 border-blue-500 pl-4">
+									<div key={date.toISOString()} className="border-l-4 border-teal-500 pl-4 bg-teal-50/30 py-2 rounded-r-lg">
 										<div className="font-bold text-gray-900 mb-2">
 											{format(date, 'EEEE, MMM d')}
 											{isToday(date) && (
-												<span className="ml-2 text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
+												<span className="ml-2 text-xs bg-gradient-to-r from-teal-500 to-cyan-500 text-white px-2 py-1 rounded-full font-semibold">
 													Today
 												</span>
 											)}
@@ -258,18 +268,22 @@ export function Calendar({ householdId, userId }: CalendarProps) {
 											{events.map((event) => (
 												<div
 													key={event.id}
-													className="flex items-start justify-between bg-gray-50 p-3 rounded-lg"
+													className="flex items-start justify-between bg-white p-3 rounded-lg border border-teal-100 hover:border-teal-300 transition-all"
 												>
 													<div className="flex-1">
 														<div className="font-medium text-gray-900">{event.title}</div>
-														<div className="text-sm text-gray-600">
-															{event.all_day ? 'All day' : format(new Date(event.start_time), 'h:mm a')}
+														<div className="text-sm text-teal-600 font-medium">
+															{event.all_day ? '🌟 All day' : format(new Date(event.start_time), 'h:mm a')}
 														</div>
 													</div>
 													{event.created_by === userId && (
 														<button
-															onClick={() => deleteEventMutation.mutate(event.id)}
-															className="text-red-600 hover:text-red-800 ml-2"
+															onClick={() => {
+																if (confirm('Delete this event?')) {
+																	deleteEventMutation.mutate(event.id)
+																}
+															}}
+															className="text-red-600 hover:text-red-800 ml-2 hover:scale-110 transition-all"
 														>
 															<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 																<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -285,7 +299,7 @@ export function Calendar({ householdId, userId }: CalendarProps) {
 						) : (
 							<div className="text-center py-12">
 								<div className="text-6xl mb-4">📅</div>
-								<p className="text-gray-600 text-lg mb-2">No events this month</p>
+								<p className="text-gray-600 text-lg mb-2 font-semibold">No events this month</p>
 								<p className="text-gray-400 text-sm">Tap the button above to add one!</p>
 							</div>
 						)}
@@ -294,17 +308,17 @@ export function Calendar({ householdId, userId }: CalendarProps) {
 
 				{/* Upcoming Events List - only show in grid view */}
 				{viewMode === 'grid' && events.length > 0 && (
-					<div className="border-t pt-6">
-						<h3 className="text-lg font-bold text-gray-900 mb-3">Upcoming Events</h3>
+					<div className="border-t-2 border-teal-100 pt-6">
+						<h3 className="text-lg font-bold text-teal-700 mb-3">Upcoming Events</h3>
 						<div className="space-y-2">
 							{events.slice(0, 5).map((event) => (
 								<div
 									key={event.id}
-									className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+									className="flex items-center justify-between p-3 bg-gradient-to-r from-teal-50 to-cyan-50 rounded-lg hover:from-teal-100 hover:to-cyan-100 transition-all border border-teal-100"
 								>
 									<div>
 										<div className="font-medium text-gray-900">{event.title}</div>
-										<div className="text-sm text-gray-600">
+										<div className="text-sm text-teal-600 font-medium">
 											{event.all_day
 												? format(new Date(event.start_time), 'MMM d, yyyy')
 												: format(new Date(event.start_time), 'MMM d, yyyy • h:mm a')}
@@ -312,8 +326,12 @@ export function Calendar({ householdId, userId }: CalendarProps) {
 									</div>
 									{event.created_by === userId && (
 										<button
-											onClick={() => deleteEventMutation.mutate(event.id)}
-											className="text-red-600 hover:text-red-800 text-sm font-medium"
+											onClick={() => {
+												if (confirm('Delete this event?')) {
+													deleteEventMutation.mutate(event.id)
+												}
+											}}
+											className="text-red-600 hover:text-red-800 text-sm font-medium hover:scale-110 transition-all"
 										>
 											Delete
 										</button>
@@ -328,7 +346,7 @@ export function Calendar({ householdId, userId }: CalendarProps) {
 			{/* Add Event Dialog */}
 			{showAddDialog && selectedDate && (
 				<div className="fixed inset-0 bg-black/20 backdrop-blur-md flex items-center justify-center p-4 z-50">
-					<div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full relative">
+					<div className="bg-white rounded-xl shadow-2xl p-6 max-w-md w-full relative border-2 border-teal-200">
 						<button
 							onClick={() => {
 								setShowAddDialog(false)
@@ -344,13 +362,13 @@ export function Calendar({ householdId, userId }: CalendarProps) {
 							</svg>
 						</button>
 
-						<h3 className="text-xl font-bold mb-4 text-gray-900">
+						<h3 className="text-xl font-bold mb-4 bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent">
 							Add Event - {format(selectedDate, 'MMM d, yyyy')}
 						</h3>
 
 						<form onSubmit={handleSubmit} className="space-y-4">
 							<div>
-								<label className="block text-sm font-medium text-gray-700 mb-1">
+								<label className="block text-sm font-semibold text-gray-700 mb-2">
 									Event Title
 								</label>
 								<input
@@ -358,20 +376,20 @@ export function Calendar({ householdId, userId }: CalendarProps) {
 									value={newEventTitle}
 									onChange={(e) => setNewEventTitle(e.target.value)}
 									placeholder="What's happening?"
-									className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+									className="w-full px-4 py-3 border-2 border-teal-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 text-gray-900 transition-all"
 									autoFocus
 								/>
 							</div>
 
 							<div>
-								<label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer mb-2">
+								<label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer mb-2 hover:text-gray-900 transition-colors">
 									<input
 										type="checkbox"
 										checked={newEventAllDay}
 										onChange={(e) => setNewEventAllDay(e.target.checked)}
-										className="w-4 h-4 text-blue-600 rounded border-gray-300"
+										className="w-4 h-4 text-teal-600 rounded border-gray-300"
 									/>
-									<span>All day event</span>
+									<span className="font-medium">All day event</span>
 								</label>
 
 								{!newEventAllDay && (
@@ -379,7 +397,7 @@ export function Calendar({ householdId, userId }: CalendarProps) {
 										type="time"
 										value={newEventTime}
 										onChange={(e) => setNewEventTime(e.target.value)}
-										className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+										className="w-full px-4 py-3 border-2 border-teal-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 text-gray-900 transition-all"
 									/>
 								)}
 							</div>
@@ -387,7 +405,7 @@ export function Calendar({ householdId, userId }: CalendarProps) {
 							<button
 								type="submit"
 								disabled={!newEventTitle.trim() || addEventMutation.isPending}
-								className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+								className="w-full px-4 py-3 bg-gradient-to-r from-teal-600 to-cyan-600 text-white rounded-lg hover:from-teal-700 hover:to-cyan-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg transition-all"
 							>
 								{addEventMutation.isPending ? 'Adding...' : 'Add Event'}
 							</button>
