@@ -1,65 +1,126 @@
-import Image from "next/image";
+'use client'
+
+import { useState } from 'react'
+import { useAuth } from '@/hooks/useAuth'
+import { AuthForm } from '@/components/AuthForm'
+import { GroceryList } from '@/components/GroceryList'
+import { QuickNotes } from '@/components/QuickNotes'
+import { supabase } from '@/lib/supabase'
+import { useQuery } from '@tanstack/react-query'
+import { Calendar } from '@/components/Calender'
+import { Tasks } from '@/components/Tasks'
 
 export default function Home() {
+  const { user, loading } = useAuth()
+  const [activeTab, setActiveTab] = useState('grocery')
+
+  // Get user's household
+  const { data: household } = useQuery({
+    queryKey: ['household', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null
+
+      const { data, error } = await supabase
+        .from('household_members')
+        .select('household_id')
+        .eq('user_id', user.id)
+        .single()
+
+      if (error) throw error
+      return data
+    },
+    enabled: !!user?.id,
+  })
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut()
+  }
+
+  const tabs = [
+    { id: 'grocery', label: 'Grocery', icon: '🛒' },
+    { id: 'notes', label: 'Notes', icon: '📝' },
+    { id: 'calendar', label: 'Calendar', icon: '📅' },
+    { id: 'tasks', label: 'Tasks', icon: '✓' },
+  ]
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-gray-600">Loading...</div>
+      </div>
+    )
+  }
+
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <AuthForm />
+      </div>
+    )
+  }
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="min-h-screen bg-gray-50">
+      {/* Combined Header with Tabs */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4">
+          {/* Top row - Logo and User */}
+          <div className="flex justify-between items-center py-3 border-b border-gray-100">
+            <h1 className="text-xl font-bold text-gray-900">Life Hub</h1>
+            <div className="flex items-center gap-4">
+              <span className="text-sm text-gray-600">{user.email}</span>
+              <button
+                onClick={handleSignOut}
+                className="text-sm text-red-600 hover:underline"
+              >
+                Sign Out
+              </button>
+            </div>
+          </div>
+
+          {/* Bottom row - Tabs */}
+          <div className="flex gap-1 py-2">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`
+                  px-4 py-2 rounded-lg font-medium text-sm transition-colors
+                  ${activeTab === tab.id
+                    ? 'bg-blue-100 text-blue-700'
+                    : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                  }
+                `}
+              >
+                <span className="mr-2">{tab.icon}</span>
+                {tab.label}
+              </button>
+            ))}
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+      </div>
+
+      {/* Content */}
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        {household?.household_id ? (
+          <>
+            {activeTab === 'grocery' && (
+              <GroceryList householdId={household.household_id} userId={user.id} />
+            )}
+            {activeTab === 'notes' && (
+              <QuickNotes householdId={household.household_id} userId={user.id} />
+            )}
+            {activeTab === 'calendar' && (
+              <Calendar householdId={household.household_id} userId={user.id} />
+            )}
+            {activeTab === 'tasks' && (
+              <Tasks householdId={household.household_id} userId={user.id} />
+            )}
+          </>
+        ) : (
+          <div className="text-gray-600">Setting up your household...</div>
+        )}
+      </div>
     </div>
-  );
+  )
 }
