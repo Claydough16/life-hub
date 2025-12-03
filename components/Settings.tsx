@@ -20,6 +20,10 @@ interface SettingsProps {
 }
 
 export function Settings({ householdId, userId }: SettingsProps) {
+  const [showPasswordChange, setShowPasswordChange] = useState(false)
+  const [newPassword, setNewPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [passwordMessage, setPasswordMessage] = useState<{ type: 'error' | 'success'; text: string } | null>(null)
   const [inviteEmail, setInviteEmail] = useState('')
   const [message, setMessage] = useState<{ type: 'error' | 'success'; text: string } | null>(null)
   const queryClient = useQueryClient()
@@ -135,6 +139,36 @@ export function Settings({ householdId, userId }: SettingsProps) {
     },
   })
 
+  // Change password mutation
+  const changePasswordMutation = useMutation({
+    mutationFn: async () => {
+      setPasswordMessage(null)
+
+      if (newPassword.length < 6) {
+        throw new Error('Password must be at least 6 characters')
+      }
+
+      if (newPassword !== confirmPassword) {
+        throw new Error('Passwords do not match')
+      }
+
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword,
+      })
+
+      if (error) throw error
+    },
+    onSuccess: () => {
+      setPasswordMessage({ type: 'success', text: 'Password updated successfully!' })
+      setNewPassword('')
+      setConfirmPassword('')
+      setTimeout(() => setShowPasswordChange(false), 2000)
+    },
+    onError: (error) => {
+      setPasswordMessage({ type: 'error', text: (error as Error).message })
+    },
+  })
+
   const handleAddMember = (e: React.FormEvent) => {
     e.preventDefault()
     addMemberMutation.mutate()
@@ -159,7 +193,7 @@ export function Settings({ householdId, userId }: SettingsProps) {
         <h2 className="text-2xl font-bold bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent mb-6 flex items-center gap-2">
           ⚙️ Household Settings
         </h2>
-        
+
         <div className="mb-6 p-4 bg-gradient-to-r from-teal-50 to-cyan-50 rounded-lg border-2 border-teal-100">
           <h3 className="text-sm font-bold text-teal-700 uppercase tracking-wider mb-2">Household Name</h3>
           <p className="text-xl font-semibold text-gray-900">{household?.name}</p>
@@ -196,11 +230,10 @@ export function Settings({ householdId, userId }: SettingsProps) {
 
               {message && (
                 <div
-                  className={`p-4 rounded-lg text-sm font-medium border-2 ${
-                    message.type === 'error'
-                      ? 'bg-red-50 text-red-700 border-red-200'
-                      : 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                  }`}
+                  className={`p-4 rounded-lg text-sm font-medium border-2 ${message.type === 'error'
+                    ? 'bg-red-50 text-red-700 border-red-200'
+                    : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                    }`}
                 >
                   {message.text}
                 </div>
@@ -288,6 +321,120 @@ export function Settings({ householdId, userId }: SettingsProps) {
         </div>
       </div>
 
+      {/* Account Settings */}
+      <div className="bg-white rounded-lg shadow-xl p-6 border border-teal-100">
+        <div className="flex items-center gap-2 mb-6">
+          <svg className="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          <h3 className="text-lg font-bold text-gray-900">
+            Account Settings
+          </h3>
+        </div>
+
+        {/* Change Password */}
+        <div className="mb-4">
+          <button
+            onClick={() => setShowPasswordChange(!showPasswordChange)}
+            className="flex items-center justify-between w-full p-4 bg-gradient-to-r from-teal-50 to-cyan-50 rounded-lg border-2 border-teal-100 hover:border-teal-300 transition-all"
+          >
+            <div className="flex items-center gap-3">
+              <svg className="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+              </svg>
+              <span className="font-semibold text-gray-900">Change Password</span>
+            </div>
+            <svg
+              className={`w-5 h-5 text-teal-600 transition-transform ${showPasswordChange ? 'rotate-180' : ''}`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+
+          {showPasswordChange && (
+            <form
+              onSubmit={(e) => {
+                e.preventDefault()
+                changePasswordMutation.mutate()
+              }}
+              className="mt-4 p-4 bg-gray-50 rounded-lg space-y-4"
+            >
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  New Password
+                </label>
+                <input
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="Enter new password"
+                  minLength={6}
+                  className="w-full px-4 py-3 border-2 border-teal-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 text-gray-900 transition-all"
+                  autoFocus
+                />
+                <p className="text-xs text-gray-500 mt-1">At least 6 characters</p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Confirm Password
+                </label>
+                <input
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Confirm new password"
+                  minLength={6}
+                  className="w-full px-4 py-3 border-2 border-teal-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 text-gray-900 transition-all"
+                />
+              </div>
+
+              {passwordMessage && (
+                <div
+                  className={`p-4 rounded-lg text-sm font-medium border-2 ${passwordMessage.type === 'error'
+                      ? 'bg-red-50 text-red-700 border-red-200'
+                      : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                    }`}
+                >
+                  {passwordMessage.text}
+                </div>
+              )}
+
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowPasswordChange(false)
+                    setNewPassword('')
+                    setConfirmPassword('')
+                    setPasswordMessage(null)
+                  }}
+                  className="flex-1 px-4 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={!newPassword || !confirmPassword || changePasswordMutation.isPending}
+                  className="flex-1 px-4 py-3 bg-gradient-to-r from-teal-600 to-cyan-600 text-white font-semibold rounded-lg hover:from-teal-700 hover:to-cyan-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg transition-all"
+                >
+                  {changePasswordMutation.isPending ? 'Updating...' : 'Update Password'}
+                </button>
+              </div>
+            </form>
+          )}
+        </div>
+
+        {/* Add more settings here in the future */}
+        <p className="text-xs text-gray-400 text-center mt-4">
+          More account settings coming soon...
+        </p>
+      </div>
+
       {/* Info Card */}
       <div className="bg-gradient-to-r from-teal-50 to-cyan-50 border-2 border-teal-200 rounded-lg p-6">
         <div className="flex gap-3">
@@ -297,7 +444,7 @@ export function Settings({ householdId, userId }: SettingsProps) {
           <div>
             <h4 className="font-bold text-teal-900 mb-1">Shared Household</h4>
             <p className="text-sm text-teal-700">
-              All members can see and manage grocery lists, notes, calendar events, and tasks. 
+              All members can see and manage grocery lists, notes, calendar events, and tasks.
               Private notes remain visible only to their creator.
             </p>
           </div>

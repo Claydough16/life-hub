@@ -10,11 +10,12 @@ import { useQuery } from '@tanstack/react-query'
 import { Calendar } from '@/components/Calender'
 import { Tasks } from '@/components/Tasks'
 import { Settings } from '@/components/Settings'
+import { Dashboard } from '@/components/Dashboard'
 import Image from 'next/image'
 
 export default function Home() {
   const { user, loading } = useAuth()
-  const [activeTab, setActiveTab] = useState('grocery')
+  const [activeTab, setActiveTab] = useState('dashboard')
 
   // Get user's household
   const { data: household } = useQuery({
@@ -39,6 +40,7 @@ export default function Home() {
   }
 
   const tabs = [
+    { id: 'dashboard', label: 'Dashboard', icon: '🏠' },
     { id: 'grocery', label: 'Grocery', icon: '🛒' },
     { id: 'notes', label: 'Notes', icon: '📝' },
     { id: 'calendar', label: 'Calendar', icon: '📅' },
@@ -79,11 +81,11 @@ export default function Home() {
               />
               <h1 className="text-xl font-bold text-white">Life Hub</h1>
             </div>
-            <div className="flex items-center gap-4">
-              <span className="text-sm text-teal-50">{user.email}</span>
+            <div className="flex items-center gap-3">
+              <span className="text-sm text-teal-50 hidden sm:inline">{user.email}</span>
               <button
                 onClick={handleSignOut}
-                className="text-sm text-teal-100 hover:text-white hover:underline transition-colors"
+                className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white font-medium rounded-lg border border-white/30 hover:border-white/50 transition-all text-sm backdrop-blur-sm"
               >
                 Sign Out
               </button>
@@ -116,6 +118,9 @@ export default function Home() {
       <div className="max-w-7xl mx-auto px-4 py-8">
         {household?.household_id ? (
           <>
+            {activeTab === 'dashboard' && household?.household_id && (
+              <Dashboard householdId={household.household_id} userId={user.id} />
+            )}
             {activeTab === 'grocery' && (
               <GroceryList householdId={household.household_id} userId={user.id} />
             )}
