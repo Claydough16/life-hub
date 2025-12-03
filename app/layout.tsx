@@ -16,6 +16,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Life Hub",
   description: "Organize your life together",
+  icons: {
+    icon: '/logo.png',
+  },
 };
 
 export default function RootLayout({

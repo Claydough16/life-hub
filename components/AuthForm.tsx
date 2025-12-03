@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import Image from 'next/image'
 
 export function AuthForm() {
 	const [loading, setLoading] = useState(false)
@@ -57,11 +58,8 @@ export function AuthForm() {
 		<div className="w-full max-w-md">
 			<div className="bg-white shadow-2xl rounded-2xl p-8 border-2 border-teal-100">
 				{/* Logo/Header */}
-				<div className="text-center mb-8">
-					<div className="text-5xl mb-3">🌊</div>
-					<h1 className="text-3xl font-bold bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent mb-2">
-						Life Hub
-					</h1>
+				<div className="text-center mb-4">
+					<Image src="/logo.png" alt="Life Hub" width={190} height={190} className="mx-auto" />
 					<p className="text-gray-600 text-sm">
 						{isSignUp ? 'Create your account' : 'Welcome back!'}
 					</p>

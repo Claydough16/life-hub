@@ -10,6 +10,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Calendar } from '@/components/Calender'
 import { Tasks } from '@/components/Tasks'
 import { Settings } from '@/components/Settings'
+import Image from 'next/image'
 
 export default function Home() {
   const { user, loading } = useAuth()
@@ -68,7 +69,16 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4">
           {/* Top row - Logo and User */}
           <div className="flex justify-between items-center py-3 border-b border-teal-500/30">
-            <h1 className="text-xl font-bold text-white">🌊 Life Hub</h1>
+            <div className="flex items-center gap-2">
+              <Image
+                src="/logo.png"
+                alt="Life Hub"
+                width={40}
+                height={40}
+                className="bg-white rounded-lg p-1 shadow-md"
+              />
+              <h1 className="text-xl font-bold text-white">Life Hub</h1>
+            </div>
             <div className="flex items-center gap-4">
               <span className="text-sm text-teal-50">{user.email}</span>
               <button
