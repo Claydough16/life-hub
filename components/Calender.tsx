@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabase'
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, isToday, startOfWeek, endOfWeek } from 'date-fns'
+import { ConfirmDialog } from './ConfirmDialog'
 
 interface Event {
 	id: string
@@ -30,6 +31,12 @@ export function Calendar({ householdId, userId }: CalendarProps) {
 	const [newEventAllDay, setNewEventAllDay] = useState(false)
 	const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
 	const queryClient = useQueryClient()
+	const [confirmDialog, setConfirmDialog] = useState<{
+		isOpen: boolean
+		title: string
+		message: string
+		onConfirm: () => void
+	} | null>(null)
 
 	// Get events for current month
 	const { data: events = [], isLoading } = useQuery({
@@ -278,11 +285,15 @@ export function Calendar({ householdId, userId }: CalendarProps) {
 													</div>
 													{event.created_by === userId && (
 														<button
-															onClick={() => {
-																if (confirm('Delete this event?')) {
+															onClick={() => setConfirmDialog({
+																isOpen: true,
+																title: 'Delete Event',
+																message: `Are you sure you want to delete "${event.title}"?`,
+																onConfirm: () => {
 																	deleteEventMutation.mutate(event.id)
+																	setConfirmDialog(null)
 																}
-															}}
+															})}
 															className="text-red-600 hover:text-red-800 ml-2 hover:scale-110 transition-all"
 														>
 															<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -326,14 +337,21 @@ export function Calendar({ householdId, userId }: CalendarProps) {
 									</div>
 									{event.created_by === userId && (
 										<button
-											onClick={() => {
-												if (confirm('Delete this event?')) {
+											onClick={() => setConfirmDialog({
+												isOpen: true,
+												title: 'Delete Event',
+												message: `Are you sure you want to delete "${event.title}"?`,
+												onConfirm: () => {
 													deleteEventMutation.mutate(event.id)
+													setConfirmDialog(null)
 												}
-											}}
-											className="text-red-600 hover:text-red-800 text-sm font-medium hover:scale-110 transition-all"
+											})}
+											className="sm:opacity-0 sm:group-hover:opacity-100 text-red-600 hover:text-red-800 hover:scale-110 transition-all flex-shrink-0"
+											title="Delete event"
 										>
-											Delete
+											<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+												<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+											</svg>
 										</button>
 									)}
 								</div>
@@ -412,6 +430,17 @@ export function Calendar({ householdId, userId }: CalendarProps) {
 						</form>
 					</div>
 				</div>
+			)}
+			{/* Confirm Delete Dialog */}
+			{confirmDialog && (
+				<ConfirmDialog
+					isOpen={confirmDialog.isOpen}
+					title={confirmDialog.title}
+					message={confirmDialog.message}
+					onConfirm={confirmDialog.onConfirm}
+					onCancel={() => setConfirmDialog(null)}
+					isLoading={deleteEventMutation.isPending}
+				/>
 			)}
 		</>
 	)

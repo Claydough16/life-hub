@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabase'
+import { ConfirmDialog } from './ConfirmDialog'
 
 interface HouseholdMember {
   user_id: string
@@ -27,6 +28,12 @@ export function Settings({ householdId, userId }: SettingsProps) {
   const [inviteEmail, setInviteEmail] = useState('')
   const [message, setMessage] = useState<{ type: 'error' | 'success'; text: string } | null>(null)
   const queryClient = useQueryClient()
+  const [confirmDialog, setConfirmDialog] = useState<{
+    isOpen: boolean
+    title: string
+    message: string
+    onConfirm: () => void
+  } | null>(null)
 
   // Get household info and members
   const { data: household } = useQuery({
@@ -306,14 +313,22 @@ export function Settings({ householdId, userId }: SettingsProps) {
 
               {isOwner && member.user_id !== userId && (
                 <button
-                  onClick={() => {
-                    if (confirm(`Remove ${member.profiles?.name || 'this user'} from household?`)) {
+                  onClick={() => setConfirmDialog({
+                    isOpen: true,
+                    title: 'Remove Member',
+                    message: `Are you sure you want to remove ${member.profiles?.name || 'this user'} from your household?`,
+                    onConfirm: () => {
                       removeMemberMutation.mutate(member.user_id)
+                      setConfirmDialog(null)
                     }
-                  }}
-                  className="text-red-600 hover:text-red-800 text-sm font-semibold px-3 py-1 rounded-lg hover:bg-red-50 transition-all"
+                  })}
+                  className="text-red-600 hover:text-red-800 text-sm font-semibold px-3 py-1 rounded-lg hover:bg-red-50 transition-all flex-shrink-0"
+                  title="Remove member"
                 >
-                  Remove
+                  <span className="hidden sm:inline">Remove</span>
+                  <svg className="w-5 h-5 sm:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
                 </button>
               )}
             </div>
@@ -396,8 +411,8 @@ export function Settings({ householdId, userId }: SettingsProps) {
               {passwordMessage && (
                 <div
                   className={`p-4 rounded-lg text-sm font-medium border-2 ${passwordMessage.type === 'error'
-                      ? 'bg-red-50 text-red-700 border-red-200'
-                      : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                    ? 'bg-red-50 text-red-700 border-red-200'
+                    : 'bg-emerald-50 text-emerald-700 border-emerald-200'
                     }`}
                 >
                   {passwordMessage.text}
@@ -450,6 +465,17 @@ export function Settings({ householdId, userId }: SettingsProps) {
           </div>
         </div>
       </div>
+      {/* Confirm Delete Dialog */}
+      {confirmDialog && (
+        <ConfirmDialog
+          isOpen={confirmDialog.isOpen}
+          title={confirmDialog.title}
+          message={confirmDialog.message}
+          onConfirm={confirmDialog.onConfirm}
+          onCancel={() => setConfirmDialog(null)}
+          isLoading={removeMemberMutation.isPending}
+        />
+      )}
     </div>
   )
 }

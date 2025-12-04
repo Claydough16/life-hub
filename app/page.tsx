@@ -11,6 +11,7 @@ import { Calendar } from '@/components/Calender'
 import { Tasks } from '@/components/Tasks'
 import { Settings } from '@/components/Settings'
 import { Dashboard } from '@/components/Dashboard'
+import { Search } from '@/components/Search'
 import Image from 'next/image'
 
 export default function Home() {
@@ -69,20 +70,26 @@ export default function Home() {
       {/* Combined Header with Tabs */}
       <div className="bg-gradient-to-r from-teal-600 to-cyan-600 border-b border-teal-700 shadow-lg">
         <div className="max-w-7xl mx-auto px-4">
-          {/* Top row - Logo and User */}
-          <div className="flex justify-between items-center py-3 border-b border-teal-500/30">
-            <div className="flex items-center gap-2">
+          {/* Top row - Logo, Search, and User */}
+          <div className="flex justify-between items-center gap-4 py-3 border-b border-teal-500/30">
+            <div className="flex items-center gap-3 flex-shrink-0">
               <Image
                 src="/logo.png"
                 alt="Life Hub"
-                width={40}
-                height={40}
-                className="bg-white rounded-lg p-1 shadow-md"
+                width={48}
+                height={48}
+                className="bg-white rounded-lg p-2 shadow-md"
               />
-              <h1 className="text-xl font-bold text-white">Life Hub</h1>
+              <h1 className="text-xl font-bold text-white hidden sm:block">Life Hub</h1>
             </div>
-            <div className="flex items-center gap-3">
-              <span className="text-sm text-teal-50 hidden sm:inline">{user.email}</span>
+
+            {/* Search Bar */}
+            {household?.household_id && (
+              <Search householdId={household.household_id} onNavigate={setActiveTab} />
+            )}
+
+            <div className="flex items-center gap-3 flex-shrink-0">
+              <span className="text-sm text-teal-50 hidden md:inline">{user.email}</span>
               <button
                 onClick={handleSignOut}
                 className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white font-medium rounded-lg border border-white/30 hover:border-white/50 transition-all text-sm backdrop-blur-sm"
